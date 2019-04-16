@@ -1,6 +1,6 @@
 
 import React,{ Component,Fragment } from 'react'
-import { BrowserRouter as Router,Route } from 'react-router-dom'
+import { BrowserRouter as Router,Route,Link } from 'react-router-dom'
 
 import Login from './pages/login'  //index.js
 import Home from './pages/home'

@@ -7,12 +7,14 @@
 
 import React,{ Component } from 'react'
 
+import Layout from 'common/layout/index.js'
+
 import './index.css'
 
 class Home extends Component {
   render(){
     return (
-      <h1>sdfsf</h1>
+       <Layout />
     )
   }
 }
