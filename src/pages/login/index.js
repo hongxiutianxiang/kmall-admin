@@ -6,8 +6,9 @@
 */
 
 import React,{ Component } from 'react'
+import axios from 'axios'
 import {
-  Form, Icon, Input, Button, Checkbox,
+  Form, Icon, Input, Button, Checkbox,message
 } from 'antd';
 
 
@@ -23,6 +24,24 @@ class NormalLoginForm extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
+        axios({
+          method:'post',
+          url:'http://127.0.0.1:3000/admin/login',
+          data:values
+        })
+        .then(result=>{
+          if(result.data.code == 0){ //登陆成功
+            //跳转到后台首页
+            window.location.href = '/'
+          }else if(result.data.code == 1){
+            message.error(result.data.message)
+          }
+        })
+        .catch(err=>{
+          console.log(err)
+          message.err('网络请求失败，请稍后再试')
+        })
+        //.finally()
       }
     });
   }
