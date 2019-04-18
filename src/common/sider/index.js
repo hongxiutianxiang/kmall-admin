@@ -22,10 +22,16 @@ class AdminSide extends Component {
 	            	<NavLink exact to='/'>首页</NavLink>
 	            </Menu.Item>
 	            <Menu.Item key="2">
-	            	<NavLink to='user'>用户管理</NavLink>
+	            	<NavLink to='/user'>用户管理</NavLink>
 	            </Menu.Item>
-              <Menu.Item key="2">
-                <NavLink to='aaa'>商品管理</NavLink>
+              <Menu.Item key="3">
+                <NavLink to='/category'>分类管理</NavLink>
+              </Menu.Item>
+              <Menu.Item key="4">
+                <NavLink to='bbb'>商品管理</NavLink>
+              </Menu.Item>
+              <Menu.Item key="5">
+                <NavLink to='ccc'>订单管理</NavLink>
               </Menu.Item>
             </Menu>
           </Sider>		

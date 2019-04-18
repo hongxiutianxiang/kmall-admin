@@ -6,11 +6,21 @@ export const request = (options)=>{
 		const params = {
           method:options.method || 'get',
           url:options.url ||'',
-          data:options.data	|| ''		
+          data:options.data	|| '',
+          withCredentials:true,		
 		}
 		axios(params)
 		.then(result=>{
-			resolve(result.data)
+			const data = result.data;
+			if(data.code == 10){//没有权限
+				//移出前端的登陆信息
+				removeUserName();
+				//跳转到登陆页面
+				window.location.href = '/login'
+				reject('没有权限')
+			}else{
+				resolve(result.data)
+			}
 		})
 		.catch(err=>{
 			reject(err)
