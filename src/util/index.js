@@ -9,6 +9,14 @@ export const request = (options)=>{
           data:options.data	|| '',
           withCredentials:true,		
 		}
+		switch(params.method.toUpperCase()){
+			case 'GET':
+			case 'DELETE':
+				params.params = options.data
+				break
+			default:
+				params.data = options.data
+		}
 		axios(params)
 		.then(result=>{
 			const data = result.data;

@@ -37,8 +37,8 @@ class App extends Component{
 			<Router>
 				<div className="App">
 					<Switch>
-						<ProtectRouter exact path="/" component={Home} />
 						<LoginRoute path="/login" component={Login} />
+						<ProtectRouter exact path="/" component={Home} />
 						<ProtectRouter path="/user" component={User} />
 						<ProtectRouter path="/category" component={Category} />
 						<Route component={Err} />
