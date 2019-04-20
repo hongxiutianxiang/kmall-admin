@@ -2,7 +2,7 @@
 
 import React,{ Component } from 'react'
 import { connect } from 'react-redux'
-import { Table,Breadcrumb,Button  } from 'antd';
+import { Breadcrumb, Button, Table, InputNumber, Divider,Modal,Input  } from 'antd';
 import { Link } from 'react-router-dom'
 
 import { actionCreator } from './store'
@@ -18,8 +18,8 @@ class CategoryList extends Component {
       pid:this.props.match.params.pid || 0
     } 
   }
-  componentDidUpdate(){
-    const oldPath = prePros.location.pathname;
+  componentDidUpdate(preProps, preState){
+    const oldPath = preProps.location.pathname;
     const newPath = this.props.location.pathname;
     if(oldPath != newPath){
       const newPid = this.props.match.params.pid;
@@ -31,15 +31,17 @@ class CategoryList extends Component {
   componentDidMount(){
     this.props.handlePage(this.state.pid,1)
   }
+
   render(){
     const {list,current,pageSize,total,handlePage,isPageFetching} = this.props;
     const { pid } = this.state
-    const dataSource = list.map(user=>{
+    const dataSource = list.map(category=>{
       return {
-        key:user.get('_id'),
-        id:user.get('_id'),
-        name:user.get('name'),
-        order:user.get('order')
+        key:category.get('_id'),
+        id:category.get('_id'),
+        name:category.get('name'),
+        order:category.get('order'),
+        pid:category.get('pid')
       }
     }).toJS()
     const columns = [{
@@ -59,13 +61,13 @@ class CategoryList extends Component {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
-      render:(text,recode)=>{
+      render:(text,recode)=>(
         <span>
           <a href="javascript:;">修改名称</a>
           <Divider type="vertical" />
           <Link to={"./category/"+recode.id} >查看子分类</Link>
         </span>
-      }
+      ),
     }];
     return (
     	<div className="CategoryList">
@@ -81,9 +83,10 @@ class CategoryList extends Component {
               <Button type='primary'>添加分类</Button>
             </Link>
           </div>
+
           <Table
             dataSource={dataSource}
-            colums={colums}
+            columns={columns}
             pagination={{
               current:current,
               pageSize:pageSize,
@@ -117,7 +120,7 @@ const mapStateToProps = (state)=>{
 const mapDispatchToProps = (dispatch)=>{
   return {
     handlePage:(pid,page)=>{
-      const action = actionCreator.getAddAction(values);
+      const action = actionCreator.getPageAction(pid,page);
       dispatch(action)
     }
   }

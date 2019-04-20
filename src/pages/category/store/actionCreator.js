@@ -4,6 +4,16 @@ import { message } from 'antd'
 import { request } from 'util'
 import { GET_USERS,ADD_CATEGORY,GET_CATEGORIES } from 'api'
 
+const getPageRequestAction = ()=>{
+	return {
+		type:types.PAGE_REQUEST
+	}
+}
+const getPageDoneAction = ()=>{
+	return {
+		type:types.PAGE_DONE
+	}
+}
 const getAddRequestAction = ()=>{
 	return {
 		type:types.ADD_REQUEST
@@ -18,6 +28,30 @@ const setLeaveOneCategoriesAction = (payload)=>{
 	return {
 		type:types.SET_LEAVE_ONE_CATEGORIES,
 		payload
+	}
+}
+
+export const getPageAction = (pid,page)=>{
+	return (dispatch)=>{
+		dispatch(getPageRequestAction())
+		request({
+			url:GET_CATEGORIES,
+			data:{
+				page:page,
+				pid:pid
+			}
+		})
+		.then(result=>{
+			if(result.code == 0){
+				dispatch(setPageAction(result.data))
+			}
+		})
+		.catch(err=>{
+			console.log(err)
+		})
+		.finally(()=>{
+			dispatch(getPageDoneAction())
+		})
 	}
 }
 
