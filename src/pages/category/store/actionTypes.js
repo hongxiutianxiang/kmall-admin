@@ -4,4 +4,6 @@
 * @Last Modified by:   TomChen
 * @Last Modified time: 2019-04-12 20:11:26
 */
-export const SET_PAGE = 'user@set_page'
+export const ADD_REQUEST = 'category@add_request'
+export const ADD_DONE = 'category@add_done'
+export const SET_LEAVE_ONE_CATEGORIES = 'category@set_leave_one_categories'

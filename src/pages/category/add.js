@@ -2,11 +2,9 @@
 
 import React,{ Component } from 'react'
 import { connect } from 'react-redux'
-
 import {
   Form, Input,Breadcrumb, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete,
 } from 'antd';
-
 
 
 const { Option } = Select;
@@ -18,9 +16,24 @@ import Layout from 'common/layout/index.js'
 
 
 class CategoryAdd extends Component {
-
+  constructor(props){
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+  componentDidMount(){
+    this.props.getLeaveOneCategories()
+  }
+  handleSubmit(e){
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.props.handleAdd(values);
+      }
+    });
+  }
   render(){
     const { getFieldDecorator } = this.props.form;
+    const { isAddFetching,leaveOneCategories } = this.props;
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -66,12 +79,19 @@ class CategoryAdd extends Component {
               })(
                 <Select style={{ width: 300 }}>
                   <Option value="0">根分类</Option>
+                  {
+                    leaveOneCategories.map(category=>{
+                      return <Option key={category.get('_id')} value={category.get('_id')}>根分类/{category.get('name')}</Option>
+                    })
+                  }
                 </Select>                
               )}
             </Form.Item>
             <Form.Item {...tailFormItemLayout}>
               <Button 
                 type="primary" 
+                loading={isAddFetching}
+                onClick={this.handleSubmit}
               >
                提交
               </Button>
@@ -85,4 +105,29 @@ class CategoryAdd extends Component {
 
 
 const WrappedCategoryAdd = Form.create()(CategoryAdd)
-export default WrappedCategoryAdd
+
+const mapStateToProps = (state)=>{
+  return {
+    isAddFetching:state.get('category').get('isAddFetching'),
+    leaveOneCategories:state.get('category').get('leaveOneCategories'),
+  }
+}
+
+const mapDispatchToProps = (dispatch)=>{
+  return {
+    handleAdd:(values)=>{
+      const action = actionCreator.getAddAction(values);
+      dispatch(action)
+    },
+    getLeaveOneCategories:()=>{
+      const action = actionCreator.getLeaveOneCategoriesAction();
+      dispatch(action)
+    }
+  }
+}
+
+
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(WrappedCategoryAdd)
+
