@@ -56,7 +56,7 @@ class ProductSave extends Component{
         	<div className="ProductSave">
         		<Layout>
                     <Breadcrumb style={{ margin: '16px 0' }}>
-                        <Breadcrumb.Item>首页</Breadcrumb.Item>
+                        <Breadcrumb.Item>首页首页</Breadcrumb.Item>
                         <Breadcrumb.Item>商品管理</Breadcrumb.Item>
                         <Breadcrumb.Item>添加商品</Breadcrumb.Item>
                     </Breadcrumb>
