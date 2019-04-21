@@ -9,9 +9,13 @@ import {
 const { Option } = Select;
 
 import CategorySelector from './category-selector.js'
+import UploadImage from 'common/upload-image'
+
 import { actionCreator } from './store'
+import { UPLOAD_PRODUCT_IMAGE } from 'api'
 
 import Layout from 'common/layout'
+
 
 
 class ProductSave extends Component{
@@ -99,7 +103,11 @@ class ProductSave extends Component{
                           )}
                         </Form.Item>
 
-                        <Form.Item label="商品图片"></Form.Item>
+                        <Form.Item label="商品图片">
+                          <UploadImage
+                            action="UPLOAD_PRODUCT_IMAGE"
+                          />
+                        </Form.Item>
 
                         <Form.Item label="商品描述"></Form.Item>
 

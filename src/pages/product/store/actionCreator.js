@@ -1,9 +1,4 @@
-/*
-* @Author: TomChen
-* @Date:   2019-04-11 20:15:26
-* @Last Modified by:   TomChen
-* @Last Modified time: 2019-04-19 19:33:05
-*/
+
 import * as types from './actionTypes.js'
 import { message } from 'antd'
 import { request } from 'util'

@@ -24,6 +24,12 @@ const getAddDoneAction = ()=>{
 		type:types.ADD_DONE
 	}
 }
+const setPageAction = (payload)=>{
+	return {
+		type:types.SET_PAGE,
+		payload
+	}
+}
 const setLeaveOneCategoriesAction = (payload)=>{
 	return {
 		type:types.SET_LEAVE_ONE_CATEGORIES,
