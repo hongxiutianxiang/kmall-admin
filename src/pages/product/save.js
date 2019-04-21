@@ -10,6 +10,8 @@ const { Option } = Select;
 
 import CategorySelector from './category-selector.js'
 import UploadImage from 'common/upload-image'
+import RichEditor from 'common/rich-editor'
+
 
 import { actionCreator } from './store'
 import { UPLOAD_PRODUCT_IMAGE } from 'api'
@@ -106,10 +108,16 @@ class ProductSave extends Component{
                         <Form.Item label="商品图片">
                           <UploadImage
                             action="UPLOAD_PRODUCT_IMAGE"
+                            max={3}
+                            getFileList={(fileList)=>{
+                              handleImages(fileList)
+                            }}
                           />
                         </Form.Item>
 
-                        <Form.Item label="商品描述"></Form.Item>
+                        <Form.Item label="商品描述">
+                          <RichEditor />
+                        </Form.Item>
 
                         <Form.Item {...tailFormItemLayout}>
                           <Button 
