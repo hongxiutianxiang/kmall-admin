@@ -3,7 +3,8 @@
 import React,{ Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  Form, Input,Breadcrumb,InputNumber, Select, Row, Col, Checkbox, Button, AutoComplete,
+  Form, Input,Breadcrumb,InputNumber, Select,
+  Row, Col, Checkbox, Button, AutoComplete,
 } from 'antd';
 
 const { Option } = Select;
@@ -14,7 +15,7 @@ import RichEditor from 'common/rich-editor'
 
 
 import { actionCreator } from './store'
-import { UPLOAD_PRODUCT_IMAGE } from 'api'
+import { UPLOAD_PRODUCT_IMAGE,UPLOAD_PRODUCT_DETAIL_IMAGE } from 'api'
 
 import Layout from 'common/layout'
 
@@ -30,12 +31,17 @@ class ProductSave extends Component{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log(values)
+            this.props.handleSave(values)
           }
         });
     }        
     render(){
         const { getFieldDecorator } = this.props.form;
+        const { 
+            handleCategoryId,
+            handleImages, 
+            handleDetail,
+          } = this.props;
         const formItemLayout = {
           labelCol: {
             xs: { span: 24 },
@@ -85,7 +91,7 @@ class ProductSave extends Component{
 
                         <Form.Item label="商品分类">
                           <CategorySelector getCategoryId={(pid,id)=>{
-                            console.log(pid,id)
+                            handleCategoryId(pid,id)
                           }} />
                         </Form.Item>
 
@@ -107,7 +113,7 @@ class ProductSave extends Component{
 
                         <Form.Item label="商品图片">
                           <UploadImage
-                            action="UPLOAD_PRODUCT_IMAGE"
+                            action={UPLOAD_PRODUCT_IMAGE}
                             max={3}
                             getFileList={(fileList)=>{
                               handleImages(fileList)
@@ -116,7 +122,12 @@ class ProductSave extends Component{
                         </Form.Item>
 
                         <Form.Item label="商品描述">
-                          <RichEditor />
+                          <RichEditor 
+                            url={UPLOAD_PRODUCT_DETAIL_IMAGE}
+                            getRichEditorValue={(value)=>{
+                              handleDetail(value)
+                            }}
+                          />
                         </Form.Item>
 
                         <Form.Item {...tailFormItemLayout}>
@@ -143,7 +154,23 @@ const mapStateToProps = (state)=>{
 
 const mapDispatchToProps = (dispatch)=>{
     return {
-      
+      handleCategoryId:(pid,id)=>{
+        const action = actionCreator.getSetCategoryAction(pid,id);
+        dispatch(action)
+      },
+      handleImages:(fileList)=>{
+        const action = actionCreator.getSetImagesAction(fileList);
+        dispatch(action)
+      },
+      handleDetail:(value)=>{
+        const action = actionCreator.getSetDetailAction(value);
+        dispatch(action)
+      },
+      handleSave:(values)=>{
+        const action = actionCreator.getSaveAction(values);
+        dispatch(action)
+      },
+
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(WrappedProductSave)

@@ -33,7 +33,9 @@ class UploadImage extends Component{
 	}
 
 	handleChange({ fileList }){
-		this.setState({ fileList })
+		this.setState({ fileList },()=>{
+			this.props.getFileList(fileList.map(file=>file.response).join(','))
+		})
 	}
 	render(){
 	    const { previewVisible, previewImage, fileList } = this.state;
@@ -45,9 +47,9 @@ class UploadImage extends Component{
 	      </div>
 	    );
 		return (
-			<div>
+			<div className="UploadImage">
 				<Upload
-		          action="//jsonplaceholder.typicode.com/posts/"
+		          action={action}
 		          listType="picture-card"
 		          fileList={fileList}
 		          onPreview={this.handlePreview}
