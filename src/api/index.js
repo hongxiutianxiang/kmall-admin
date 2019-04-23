@@ -10,8 +10,8 @@ export const GET_CATEGORIES = SERVER +'category'
 export const UPLOAD_PRODUCT_IMAGE = SERVER +'product/uploadImage'
 export const UPLOAD_PRODUCT_DETAIL_IMAGE = SERVER +'product/uploadDetailImage'
 export const SAVE_PRODUCT = SERVER +'product'
-
-
+export const GET_PRODUCTS = SERVER +'product'
+export const UPDATE_PRODUCT_ORDER = SERVER +'product/updateOrder'
 
 
 

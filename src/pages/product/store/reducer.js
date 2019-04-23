@@ -13,6 +13,11 @@ const defaultState = fromJS({
 	categoryId:'',
 	images:'',
 	detail:'',
+	categoryIdValidateStatus:'',
+	categoryIdHelp:'',
+	imagesValidateStatus:'',
+	imagesHelp:'',
+	isSaveFetching:false,
 
 	isPageFetching:false,	
 	list:[],
@@ -39,13 +44,37 @@ export default (state=defaultState,action)=>{
 		return state.merge({
 			parentCategoryId:action.payload.parentCategoryId,
 			categoryId:action.payload.categoryId,
+			categoryIdValidateStatus:'',
+			categoryIdHelp:''
 		})
 	}
 	if(action.type == types.SET_IMAGES){
-		return state.set('images',action.payload)
+		return state.merge({
+			images:action.payload,
+			imagesValidateStatus:'',
+			imagesHelp:''
+		})
 	}
 	if(action.type == types.SET_DETAIL){
 		return state.set('detail',action.payload)
+	}
+	if(action.type == types.SET_CATEGORY_ERROR){
+		return state.merge({
+			categoryIdValidateStatus:'error',
+			categoryIdHelp:'请选择商品分类'
+		})
+	}
+	if(action.type == types.SET_IMAGES_ERROR){
+		return state.merge({
+			imagesValidateStatus:'error',
+			imagesHelp:'请选择商品图片'
+		})
+	}
+	if(action.type == types.SAVE_REQUEST){
+		return state.set('isSaveFetching',true)
+	}
+	if(action.type == types.SAVE_DONE){
+		return state.set('isSaveFetching',false)
 	}
 
 	return state;

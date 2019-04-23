@@ -2,12 +2,10 @@
 import * as types from './actionTypes.js'
 import { message } from 'antd'
 import { request } from 'util'
-import { GET_USERS,
-	ADD_CATEGORY,
-	GET_CATEGORIES,
-	UPDATE_CATEGORY_ORDER,
-	UPDATE_CATEGORY_NAME,
-	SAVE_PRODUCT 
+import {
+	SAVE_PRODUCT,
+	GET_PRODUCTS,
+	UPDATE_PRODUCT_ORDER 
 } from 'api'
 
 export const getSetCategoryAction = (pid,id)=>{
@@ -31,12 +29,49 @@ export const getSetDetailAction = (payload)=>{
 		payload
 	}
 }
-export const getSaveAction = (values)=>{
+const setCategoryError =()=>{
+	return {
+		type:types.SET_CATEGORY_ERROR
+	}
+}
+const setImagesError =()=>{
+	return {
+		type:types.SET_IMAGES_ERROR
+	}
+}
+const getSaveRequestAction = ()=>{
+	return {
+		type:types.SAVE_REQUEST
+	}
+}
+const getSaveDoneAction = ()=>{
+	return {
+		type:types.SAVE_DONE
+	}
+}
+export const getSaveAction = (err,values)=>{
 	return (dispatch,getState)=>{
 		const state = getState().get('product');
 		const category = state.get('categoryId');
 		const images = state.get('images');
 		const detail = state.get('detail');
+		let hasError = false;
+		if(err){
+			hasError = true;
+		}
+		if(!category){
+			dispatch(setCategoryError());
+			hasError = true;
+		}
+		if(!images){
+			dispatch(setImagesError());
+			hasError = true;
+		}
+		if(hasError){
+			return;
+		}
+		console.log('ff')
+		dispatch(getSaveRequestAction())
 		request({
 			method:'post',
 			url:SAVE_PRODUCT,
@@ -48,7 +83,14 @@ export const getSaveAction = (values)=>{
 			}
 		})
 		.then(result=>{
-			console.log('aa',result)
+			if(result.code == 0){
+				window.location.href="/product"
+			}else{
+				message.error(result.message)
+			}
+		})
+		.finally(()=>{
+			dispatch(getSaveDoneAction())
 		})
 	}	
 }
@@ -75,14 +117,13 @@ const setPageAction = (payload)=>{
 	}
 }
 
-export const getPageAction = (pid,page)=>{
+export const getPageAction = (page)=>{
 	return (dispatch)=>{
 		dispatch(getPageRequestAction())
 		request({
-			url:GET_CATEGORIES,
+			url:GET_PRODUCTS,
 			data:{
 				page:page,
-				pid:pid
 			}
 		})
 		.then(result=>{
@@ -98,24 +139,28 @@ export const getPageAction = (pid,page)=>{
 		})
 	}
 }
-export const getOrderAction = (pid,id,newOrder)=>{
+export const getUpdateOrderAction = (id,newOrder)=>{
 	return (dispatch,getState)=>{
-		const state = getState().get('category');
+		console.log('aa')
+		const state = getState().get('product');
 		request({
 			method:'put',
-			url:UPDATE_CATEGORY_ORDER,
+			url:UPDATE_PRODUCT_ORDER,
 			data:{
-				pid:pid,
 				id:id,
 				order:newOrder,
 				page:state.get('current')
 			}
 		})
 		.then(result=>{
+			console.log('cc')
 			if(result.code == 0){
 				message.success('更新排序成功')
 				dispatch(setPageAction(result.data))
 			}
+		})
+		.catch(err=>{
+			console.log(err)
 		})
 	}	
 }
