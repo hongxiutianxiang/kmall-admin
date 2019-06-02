@@ -25,16 +25,8 @@ class ProductSave extends Component{
     constructor(props){
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this)
-        console.log('aa',this.props.match.params.productId)
-        this.state = {
-          productId:this.props.match.params.productId
-        }
     }
-    componentDidMount(){
-      if(this.state.productId){
-        this.props.handleProductDetail(this.state.productId)
-      }
-    }
+
     handleSubmit(e){
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -52,18 +44,8 @@ class ProductSave extends Component{
             categoryIdHelp,
             imagesValidateStatus,
             imagesHelp,
-            isSaveFetching,
-
-            parentCategoryId,
-            categoryId,
-            images,
-            detail,
-            description,
-            name,
-            price,
-            stock,
+            isSaveFetching
           } = this.props;
-          console.log('1111',name)
         const formItemLayout = {
           labelCol: {
             xs: { span: 24 },
@@ -98,7 +80,6 @@ class ProductSave extends Component{
                         <Form.Item label="商品名称">
                           {getFieldDecorator('name', {
                             rules: [{ required: true, message: '请输入商品名称!' }],
-                            initialValue:name
                           })(
                             <Input placeholder="商品名称" />
                           )}
@@ -191,18 +172,9 @@ const mapStateToProps = (state)=>{
       imagesValidateStatus:state.get('product').get('imagesValidateStatus'),
       imagesHelp:state.get('product').get('imagesHelp'),
       isSaveFetching:state.get('product').get('isSaveFetching'),
-      
-      parentCategoryId:state.get('product').get('parentCategoryId'),
-      categoryId:state.get('product').get('categoryId'),
-      images:state.get('product').get('images'),
-      detail:state.get('product').get('detail'),
-      description:state.get('product').get('description'),
-      name:state.get('product').get('name'),
-      price:state.get('product').get('price'),
-      stock:state.get('product').get('stock'),
      }
-
 }
+
 const mapDispatchToProps = (dispatch)=>{
     return {
       handleCategoryId:(pid,id)=>{
@@ -221,10 +193,6 @@ const mapDispatchToProps = (dispatch)=>{
         const action = actionCreator.getSaveAction(err,values);
         dispatch(action)
       },
-      handleProductDetail:(productId)=>{
-        const action = actionCreator.getProductDetailAction(productId);
-        dispatch(action)
-      }
 
     }
 }

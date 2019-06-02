@@ -13,19 +13,13 @@ const defaultState = fromJS({
 	categoryId:'',
 	images:'',
 	detail:'',
-	description:'',
-	name:'',
-	price:'',
-	stock:'',
-
 	categoryIdValidateStatus:'',
 	categoryIdHelp:'',
 	imagesValidateStatus:'',
 	imagesHelp:'',
-
 	isSaveFetching:false,
-	isPageFetching:false,
 
+	isPageFetching:false,	
 	list:[],
 	current:1,
 	pageSize:0,
@@ -81,18 +75,6 @@ export default (state=defaultState,action)=>{
 	}
 	if(action.type == types.SAVE_DONE){
 		return state.set('isSaveFetching',false)
-	}
-	if(action.type == types.SET_PRODUCT_DETAIL){
-		return state.merge({
-			parentCategoryId:action.payload.category.pid,
-			categoryId:action.payload.category._id,
-			images:action.payload.category.images,
-			detail:action.payload.category.detail,
-			description:action.payload.category.description,
-			name:action.payload.category.name,
-			price:action.payload.category.price,
-			stock:action.payload.category.stock,
-		})
 	}
 
 	return state;

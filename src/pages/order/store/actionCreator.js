@@ -5,9 +5,7 @@ import { request } from 'util'
 import {
 	SAVE_PRODUCT,
 	GET_PRODUCTS,
-	UPDATE_PRODUCT_ORDER,
-	UPDATE_PRODUCT_STATUS,
-	GET_PRODUCT_DETAIL,
+	UPDATE_PRODUCT_ORDER 
 } from 'api'
 
 export const getSetCategoryAction = (pid,id)=>{
@@ -166,54 +164,9 @@ export const getUpdateOrderAction = (id,newOrder)=>{
 		})
 	}	
 }
-export const getUpdateStatusAction = (id,newStatus)=>{
-	return (dispatch,getState)=>{
-		const state = getState().get('product');
-		request({
-			method:'put',
-			url:UPDATE_PRODUCT_STATUS,
-			data:{
-				id:id,
-				status:newStatus,
-				page:state.get('current')
-			}
-		})
-		.then(result=>{
-			if(result.code == 0){
-				message.success('更新状态成功')
-				dispatch(setPageAction(result.data))
-			}
-		})
-		.catch(err=>{
-			console.log(err)
-		})
-	}	
-}
-const setProductDetailAction = (payload)=>{
-	return {
-		type:types.SET_PRODUCT_DETAIL,
-		payload
-	}
-}
-export const getProductDetailAction = (productId)=>{
-	return (dispatch,getState)=>{
-		request({
-			url:GET_PRODUCT_DETAIL,
-			data:{
-				id:productId,
-			}
-		})
-		.then(result=>{
-			if(result.code == 0){
-				console.log(result.data)
-				dispatch(setProductDetailAction(result.data))
-			}
-		})
-		.catch(err=>{
-			console.log(err)
-		})
-	}	
-}
+
+
+
 
 
 

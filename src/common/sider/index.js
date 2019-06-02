@@ -31,7 +31,7 @@ class AdminSide extends Component {
                 <NavLink to='/product'>商品管理</NavLink>
               </Menu.Item>
               <Menu.Item key="5">
-                <NavLink to='ccc'>订单管理</NavLink>
+                <NavLink to='/order'>订单管理</NavLink>
               </Menu.Item>
             </Menu>
           </Sider>		
