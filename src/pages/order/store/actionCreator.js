@@ -3,101 +3,11 @@ import * as types from './actionTypes.js'
 import { message } from 'antd'
 import { request } from 'util'
 import {
-	SAVE_PRODUCT,
-	GET_PRODUCTS,
-	UPDATE_PRODUCT_ORDER 
+	GET_ORDERS,
+	GET_ORDER_DETAIL,
+	SEARCH_ORDERS,
+	UPDATE_ORDER_DELIVER,
 } from 'api'
-
-export const getSetCategoryAction = (pid,id)=>{
-	return {
-		type:types.SET_CATEGORY_ID,
-		payload:{
-			parentCategoryId:pid,
-			categoryId:id
-		}
-	}
-}
-export const getSetImagesAction = (payload)=>{
-	return {
-		type:types.SET_IMAGES,
-		payload
-	}
-}
-export const getSetDetailAction = (payload)=>{
-	return {
-		type:types.SET_DETAIL,
-		payload
-	}
-}
-const setCategoryError =()=>{
-	return {
-		type:types.SET_CATEGORY_ERROR
-	}
-}
-const setImagesError =()=>{
-	return {
-		type:types.SET_IMAGES_ERROR
-	}
-}
-const getSaveRequestAction = ()=>{
-	return {
-		type:types.SAVE_REQUEST
-	}
-}
-const getSaveDoneAction = ()=>{
-	return {
-		type:types.SAVE_DONE
-	}
-}
-export const getSaveAction = (err,values)=>{
-	return (dispatch,getState)=>{
-		const state = getState().get('product');
-		const category = state.get('categoryId');
-		const images = state.get('images');
-		const detail = state.get('detail');
-		let hasError = false;
-		if(err){
-			hasError = true;
-		}
-		if(!category){
-			dispatch(setCategoryError());
-			hasError = true;
-		}
-		if(!images){
-			dispatch(setImagesError());
-			hasError = true;
-		}
-		if(hasError){
-			return;
-		}
-		console.log('ff')
-		dispatch(getSaveRequestAction())
-		request({
-			method:'post',
-			url:SAVE_PRODUCT,
-			data:{
-				...values,
-				category,
-				images,
-				detail
-			}
-		})
-		.then(result=>{
-			if(result.code == 0){
-				window.location.href="/product"
-			}else{
-				message.error(result.message)
-			}
-		})
-		.finally(()=>{
-			dispatch(getSaveDoneAction())
-		})
-	}	
-}
-
-
-
-
 
 
 const getPageRequestAction = ()=>{
@@ -121,7 +31,7 @@ export const getPageAction = (page)=>{
 	return (dispatch)=>{
 		dispatch(getPageRequestAction())
 		request({
-			url:GET_PRODUCTS,
+			url:GET_ORDERS,
 			data:{
 				page:page,
 			}
@@ -139,24 +49,25 @@ export const getPageAction = (page)=>{
 		})
 	}
 }
-export const getUpdateOrderAction = (id,newOrder)=>{
+
+const setOrderDetailAction = (payload)=>{
+	return {
+		type:types.SET_ORDER_DETAIL,
+		payload
+	}
+}
+export const getOrderDetailAction = (orderNo)=>{
 	return (dispatch,getState)=>{
-		console.log('aa')
-		const state = getState().get('product');
 		request({
-			method:'put',
-			url:UPDATE_PRODUCT_ORDER,
+			url:GET_ORDER_DETAIL,
 			data:{
-				id:id,
-				order:newOrder,
-				page:state.get('current')
+				orderNo:orderNo,
 			}
 		})
 		.then(result=>{
-			console.log('cc')
 			if(result.code == 0){
-				message.success('更新排序成功')
-				dispatch(setPageAction(result.data))
+				// console.log('result.data:::',result.data)
+				dispatch(setOrderDetailAction(result.data))
 			}
 		})
 		.catch(err=>{
@@ -164,10 +75,40 @@ export const getUpdateOrderAction = (id,newOrder)=>{
 		})
 	}	
 }
-
-
-
-
-
+export const getSearchAction = (keyword,page)=>{
+	return (dispatch)=>{
+		request({
+			url:SEARCH_ORDERS,
+			data:{
+				keyword:keyword,
+				page:page
+			}
+		})
+		.then(result=>{
+			if(result.code == 0){
+				dispatch(setPageAction(result.data))
+			}else if(result.code == 1){
+				message.error(result.message)
+			}
+		})
+	}
+}
+export const getOrderDeliverAction = (orderNo)=>{
+	return (dispatch,getState)=>{
+		request({
+			url:UPDATE_ORDER_DELIVER,
+			method:'put',
+			data:{
+				orderNo:orderNo,
+			}
+		})
+		.then(result=>{
+			if(result.code == 0){
+				// console.log('result.data:::',result.data)
+				dispatch(setOrderDetailAction(result.data))
+			}
+		})
+	}	
+}
 
 

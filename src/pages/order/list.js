@@ -2,7 +2,8 @@
 
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Breadcrumb, Button, Table, InputNumber, Divider,Modal,Input } from 'antd'
+import { Breadcrumb, Button, Table, InputNumber, Divider,Modal,Input,Switch } from 'antd'
+const Search = Input.Search;
 import { Link } from "react-router-dom"
 import { actionCreator } from './store'
 import Layout from 'common/layout'
@@ -22,50 +23,65 @@ class OrderList extends Component {
             total, 
             handlePage, 
             isPageFetching,
-            handleUpdateOrder,
-     
+            handleSearch,
+            keyword
         } = this.props;
         const dataSource = list.map(order => {
             return {
                 key: order.get('_id'),
-                id: order.get('_id'),
-                name: order.get('name'),
-                order: order.get('order'),
-                state:order.get('state')
+                orderNo: order.get('orderNo'),
+                statusDesc: order.get('statusDesc'),
+                payment: "￥"+order.get('payment'),
+                name:order.get('shipping').get('name'),
+                phone:order.get('shipping').get('phone'),
+                createdTime: new Date(order.get('createdAt')).toLocaleString(),
             }
         }).toJS()
         const columns = [{
-            title: 'id',
-            dataIndex: 'id',
-            key: 'id',
-        }, {
-            title: '商品名称',
+            title: '订单号',
+            dataIndex: 'orderNo',
+            key: 'orderNo',
+            render:orderNo=>{
+                if(keyword){
+                    const reg = new RegExp('('+keyword+')','ig');
+                    const html = orderNo.replace(reg,"<b style='color:red'>$1</b>");
+                    return <span dangerouslySetInnerHTML={{__html:html}}></span>;
+                }else{
+                    return orderNo;
+                }
+            }
+        },{
+            title: '订单状态',
+            dataIndex: 'statusDesc',
+            key: 'statusDesc',
+            
+        },{
+            title: '订单金额',
+            dataIndex: 'payment',
+            key: 'payment',
+            
+        },{
+            title: '下单时间',
+            dataIndex: 'createdTime',
+            key: 'createdTime',
+            
+        },{
+            title: '收货人',
             dataIndex: 'name',
             key: 'name',
-        }, {
-            title: '排序',
-            dataIndex: 'order',
-            key: 'order',
-            render: (order,record) => <InputNumber 
-                    defaultValue={order} 
-                    onBlur={(ev)=>{
-                        console.log('ff')
-                        handleUpdateOrder(record.id,ev.target.value)
-                    }}
-                />
+            
         },{
-            title: '状态',
-            dataIndex: 'status',
-            key: 'status',
-        }, {
+            title: '收货人电话',
+            dataIndex: 'phone',
+            key: 'phone',
+            
+        },{
             title: '操作',
             dataIndex: 'action',
             key: 'action',
             render: (order, record) => (
                 <span>
-                  <Link to={"/order/detail/"+record.id} >查看详情</Link>  
-                  <Divider type="vertical" />
-                  <Link to={"/order/save/"+record.id} >修改</Link>
+                  <Link to={"/order/detail/"+record.orderNo} >查看详情</Link>   
                 </span>
             ),
         }];
@@ -74,13 +90,18 @@ class OrderList extends Component {
             <Layout>
               <Breadcrumb style={{ margin: '16px 0' }}>
                 <Breadcrumb.Item>首页</Breadcrumb.Item>
-                <Breadcrumb.Item>商品管理</Breadcrumb.Item>
-                <Breadcrumb.Item>商品列表</Breadcrumb.Item>
+                <Breadcrumb.Item>订单管理</Breadcrumb.Item>
+                <Breadcrumb.Item>订单列表</Breadcrumb.Item>
               </Breadcrumb>
               <div className="clearfix">
-                <Link style={{float:'right'}} to="/order/save">
-                    <Button  type="primary" >添加商品</Button>
-                </Link>
+                  <Search 
+                      placeholder="请输入订单号" 
+                      onSearch={value => {
+                        handleSearch(value)
+                      }} 
+                      enterButton 
+                      style={{ width: 300 }}
+                  />
               </div>
               <Table 
                     dataSource={dataSource} 
@@ -91,7 +112,11 @@ class OrderList extends Component {
                         total:total
                     }}
                     onChange={(page)=>{
-                        handlePage(page.current)
+                        if(keyword){
+                            handleSearch(keyword,page.current)
+                        }else{
+                            handlePage(page.current) 
+                        } 
                     }}
                     loading={{
                         spinning:isPageFetching,
@@ -110,6 +135,8 @@ const mapStateToProps = (state) => {
         pageSize: state.get('order').get('pageSize'),
         total: state.get('order').get('total'),
         isPageFetching: state.get('order').get('isPageFetching'),
+        keyword: state.get('order').get('keyword'),
+        
     }
 }
 
@@ -119,11 +146,10 @@ const mapDispatchToProps = (dispath) => {
             const action = actionCreator.getPageAction(page)
             dispath(action)
         },
-        handleUpdateOrder:(id,newOrder)=>{
-            const action = actionCreator.getUpdateOrderAction(id,newOrder)
-            dispath(action)            
+       handleSearch: (keyword,page) => {
+            const action = actionCreator.getSearchAction(keyword,page)
+            dispath(action)
         },
-       
     }
 }
 

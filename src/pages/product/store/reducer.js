@@ -30,6 +30,7 @@ const defaultState = fromJS({
 	current:1,
 	pageSize:0,
 	total:0,
+	keyword:'',
 })
 export default (state=defaultState,action)=>{
 	if(action.type == types.SET_PAGE){
@@ -37,7 +38,8 @@ export default (state=defaultState,action)=>{
 			list:fromJS(action.payload.list),
 			current:action.payload.current,
 			pageSize:action.payload.pageSize,
-			total:action.payload.total				
+			total:action.payload.total,
+			keyword:action.payload.keyword || ''						
 		})
 	}
 	if(action.type == types.PAGE_REQUEST){
@@ -86,12 +88,12 @@ export default (state=defaultState,action)=>{
 		return state.merge({
 			parentCategoryId:action.payload.category.pid,
 			categoryId:action.payload.category._id,
-			images:action.payload.category.images,
-			detail:action.payload.category.detail,
-			description:action.payload.category.description,
-			name:action.payload.category.name,
-			price:action.payload.category.price,
-			stock:action.payload.category.stock,
+			images:action.payload.images,
+			detail:action.payload.detail,
+			description:action.payload.description,
+			name:action.payload.name,
+			price:action.payload.price,
+			stock:action.payload.stock,
 		})
 	}
 

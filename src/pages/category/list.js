@@ -33,7 +33,16 @@ class CategoryList extends Component {
   }
 
   render(){
-    const {list,current,pageSize,total,handlePage,isPageFetching} = this.props;
+    const {
+      list,
+      current,
+      pageSize,
+      total,handlePage,
+      isPageFetching,
+      updateNameModalVisible,
+      showUpdateNameModel,
+      closeUpdateNameModel
+    } = this.props;
     const { pid } = this.state
     const dataSource = list.map(category=>{
       return {
@@ -63,7 +72,13 @@ class CategoryList extends Component {
       key: 'action',
       render:(text,recode)=>(
         <span>
-          <a href="javascript:;">修改名称</a>
+          <a href="javascript:;"
+             onClick={()=>{
+              showUpdateNameModel()
+             }}
+          >
+            修改名称
+          </a>
           <Divider type="vertical" />
           <Link to={"./category/"+recode.id} >查看子分类</Link>
         </span>
@@ -100,6 +115,16 @@ class CategoryList extends Component {
               tip:'正在加载数据'
             }}
           />
+          <Modal
+            title="修改分类名称"
+            visible={updateNameModalVisible}
+            onOk={this.handleOk}
+            onCancel={closeUpdateNameModel}
+            cancelText="取消"
+            okText="确认"
+          >
+          <Input/>
+          </Modal>
         </Layout>	
     	</div>
     )
@@ -114,6 +139,8 @@ const mapStateToProps = (state)=>{
     pageSize:state.get('category').get('pageSize'),
     total:state.get('category').get('total'),
     isPageFetching:state.get('category').get('isPageFetching'),
+    updateNameModalVisible:state.get('category').get('updateNameModalVisible'),
+
   }
 }
 
@@ -122,7 +149,15 @@ const mapDispatchToProps = (dispatch)=>{
     handlePage:(pid,page)=>{
       const action = actionCreator.getPageAction(pid,page);
       dispatch(action)
-    }
+    },
+    showUpdateNameModel:()=>{
+      const action = actionCreator.getShowUpdateNameModel();
+      dispatch(action)
+    },
+    closeUpdateNameModel:()=>{
+      const action = actionCreator.getCloseUpdateNameModel();
+      dispatch(action)
+    },
   }
 }
 

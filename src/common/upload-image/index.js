@@ -8,18 +8,21 @@ class UploadImage extends Component{
 		this.state = {
 			previewVisible: false,
 			previewImage: '',
-			fileList: [{
-			  uid: '-1',
-			  name: 'xxx.png',
-			  status: 'done',
-			  url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-			}],
+			fileList: [],
 		};
 		this.handleCancel = this.handleCancel.bind(this)
 		this.handlePreview = this.handlePreview.bind(this)
 		this.handleChange = this.handleChange.bind(this)
 	}
-
+	static getDerivedStateFromProps(props,state){
+		if(props.fileList.length > 0 && state.fileList == 0){
+			console.log('asfsadfasdfasd')
+			return {
+				fileList:props.fileList
+			}
+		}
+		return null;
+	}
 
 	handleCancel (){
 		this.setState({ previewVisible: false})

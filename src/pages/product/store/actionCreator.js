@@ -8,6 +8,7 @@ import {
 	UPDATE_PRODUCT_ORDER,
 	UPDATE_PRODUCT_STATUS,
 	GET_PRODUCT_DETAIL,
+	SEARCH_PRODUCTS,
 } from 'api'
 
 export const getSetCategoryAction = (pid,id)=>{
@@ -72,10 +73,13 @@ export const getSaveAction = (err,values)=>{
 		if(hasError){
 			return;
 		}
-		console.log('ff')
+		let method = 'post'
+		if(values.id){
+			method = 'put'
+		}
 		dispatch(getSaveRequestAction())
 		request({
-			method:'post',
+			method:method,
 			url:SAVE_PRODUCT,
 			data:{
 				...values,
@@ -205,7 +209,7 @@ export const getProductDetailAction = (productId)=>{
 		})
 		.then(result=>{
 			if(result.code == 0){
-				console.log(result.data)
+				// console.log('result.data:::',result.data)
 				dispatch(setProductDetailAction(result.data))
 			}
 		})
@@ -214,7 +218,24 @@ export const getProductDetailAction = (productId)=>{
 		})
 	}	
 }
-
+export const getSearchAction = (keyword,page)=>{
+	return (dispatch)=>{
+		request({
+			url:SEARCH_PRODUCTS,
+			data:{
+				keyword:keyword,
+				page:page
+			}
+		})
+		.then(result=>{
+			if(result.code == 0){
+				dispatch(setPageAction(result.data))
+			}else if(result.code == 1){
+				message.error(result.message)
+			}
+		})
+	}
+}
 
 
 

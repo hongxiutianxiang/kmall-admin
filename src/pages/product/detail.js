@@ -10,42 +10,41 @@ import {
 const { Option } = Select;
 
 import CategorySelector from './category-selector.js'
-import UploadImage from 'common/upload-image'
-import RichEditor from 'common/rich-editor'
-
 
 import { actionCreator } from './store'
-import { UPLOAD_PRODUCT_IMAGE,UPLOAD_PRODUCT_DETAIL_IMAGE } from 'api'
 
 import Layout from 'common/layout'
 
+import './detail.css'
 
-
-class ProductSave extends Component{
+class ProductDetail extends Component{
     constructor(props){
         super(props);
-        this.handleSubmit = this.handleSubmit.bind(this)
+        this.state = {
+          productId:this.props.match.params.productId
+        }
     }
-
-    handleSubmit(e){
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-          console.log('dd')
-          this.props.handleSave(err,values)
-        });
-    }        
+    componentDidMount(){
+      if(this.state.productId){
+        this.props.handleProductDetail(this.state.productId)
+      }
+    }      
     render(){
         const { getFieldDecorator } = this.props.form;
         const { 
-            handleCategoryId,
-            handleImages, 
-            handleDetail,
-            categoryIdValidateStatus,
-            categoryIdHelp,
-            imagesValidateStatus,
-            imagesHelp,
-            isSaveFetching
+            parentCategoryId,
+            categoryId,
+            images,
+            detail,
+            description,
+            name,
+            price,
+            stock,
           } = this.props;
+          let imgbox = '';
+          if(images){
+            imgbox = images.split(',').map((url,index)=><li key={index}><img src={url}/></li>)
+          }
         const formItemLayout = {
           labelCol: {
             xs: { span: 24 },
@@ -69,47 +68,50 @@ class ProductSave extends Component{
           },
         };        
         return (
-        	<div className="ProductSave">
+        	<div className="ProductDetail">
         		<Layout>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item>首页</Breadcrumb.Item>
                         <Breadcrumb.Item>商品管理</Breadcrumb.Item>
-                        <Breadcrumb.Item>添加商品</Breadcrumb.Item>
+                        <Breadcrumb.Item>查看商品</Breadcrumb.Item>
                     </Breadcrumb>
                     <Form {...formItemLayout}>
                         <Form.Item label="商品名称">
                           {getFieldDecorator('name', {
                             rules: [{ required: true, message: '请输入商品名称!' }],
+                            initialValue:name
                           })(
-                            <Input placeholder="商品名称" />
+                            <Input disabled={true} placeholder="商品名称" />
                           )}
                         </Form.Item>
 
                         <Form.Item label="商品描述">
                           {getFieldDecorator('description', {
                             rules: [{ required: true, message: '请输入商品描述!' }],
+                            initialValue:description
                           })(
-                            <Input placeholder="商品描述" />
+                            <Input disabled={true} placeholder="商品描述" />
                           )}
                         </Form.Item>  
 
                         <Form.Item 
                           label="商品分类"
                           required={true}
-                          validateStatus={categoryIdValidateStatus}
-                          help={categoryIdHelp}
                         >
-                          <CategorySelector getCategoryId={(pid,id)=>{
-                            handleCategoryId(pid,id)
-                          }} />
+                          <CategorySelector 
+                            parentCategoryId={parentCategoryId}
+                            categoryId={categoryId}
+                            disabled={true}
+                          />
                         </Form.Item>
 
                         <Form.Item label="商品价格">
                           {getFieldDecorator('price', {
                             rules: [{ required: true, message: '请输入商品价格!' }],
+                            initialValue:price
                           })(
                             <InputNumber 
-                               min={0}
+                               disabled={true}
                             />
                           )}
                         </Form.Item>  
@@ -117,9 +119,10 @@ class ProductSave extends Component{
                         <Form.Item label="商品库存">
                           {getFieldDecorator('stock', {
                             rules: [{ required: true, message: '请输入商品库存!' }],
+                            initialValue:stock
                           })(
                             <InputNumber 
-                              min={0}
+                              disabled={true}
                             />
                           )}
                         </Form.Item>
@@ -127,35 +130,12 @@ class ProductSave extends Component{
                         <Form.Item 
                           label="商品图片"
                           required={true}
-                          validateStatus={imagesValidateStatus}
-                          help={imagesHelp}
                         >
-                          <UploadImage
-                            action={UPLOAD_PRODUCT_IMAGE}
-                            max={3}
-                            getFileList={(fileList)=>{
-                              handleImages(fileList)
-                            }}
-                          />
+                          <ul className="imgBox">{imgbox}</ul>
                         </Form.Item>
 
                         <Form.Item label="商品描述">
-                          <RichEditor 
-                            url={UPLOAD_PRODUCT_DETAIL_IMAGE}
-                            getRichEditorValue={(value)=>{
-                              handleDetail(value)
-                            }}
-                          />
-                        </Form.Item>
-
-                        <Form.Item {...tailFormItemLayout}>
-                          <Button 
-                            type="primary"
-                            onClick={this.handleSubmit}
-                            loading={isSaveFetching}
-                          >
-                            提交
-                          </Button>
+                          <div dangerouslySetInnerHTML={{__html:detail}}></div>
                         </Form.Item>
                     </Form>                  
         		</Layout>
@@ -163,37 +143,29 @@ class ProductSave extends Component{
         )
     }
 }
-const WrappedProductSave = Form.create()(ProductSave);
+const WrappedProductDetail = Form.create()(ProductDetail);
 
 const mapStateToProps = (state)=>{
-    return {  
-      categoryIdValidateStatus:state.get('product').get('categoryIdValidateStatus'),
-      categoryIdHelp:state.get('product').get('categoryIdHelp'),
-      imagesValidateStatus:state.get('product').get('imagesValidateStatus'),
-      imagesHelp:state.get('product').get('imagesHelp'),
-      isSaveFetching:state.get('product').get('isSaveFetching'),
+    return {
+      
+      parentCategoryId:state.get('product').get('parentCategoryId'),
+      categoryId:state.get('product').get('categoryId'),
+      images:state.get('product').get('images'),
+      detail:state.get('product').get('detail'),
+      description:state.get('product').get('description'),
+      name:state.get('product').get('name'),
+      price:state.get('product').get('price'),
+      stock:state.get('product').get('stock'),
      }
-}
 
+}
 const mapDispatchToProps = (dispatch)=>{
     return {
-      handleCategoryId:(pid,id)=>{
-        const action = actionCreator.getSetCategoryAction(pid,id);
+      handleProductDetail:(productId)=>{
+        const action = actionCreator.getProductDetailAction(productId);
         dispatch(action)
-      },
-      handleImages:(fileList)=>{
-        const action = actionCreator.getSetImagesAction(fileList);
-        dispatch(action)
-      },
-      handleDetail:(value)=>{
-        const action = actionCreator.getSetDetailAction(value);
-        dispatch(action)
-      },
-      handleSave:(err,values)=>{
-        const action = actionCreator.getSaveAction(err,values);
-        dispatch(action)
-      },
+      }
 
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(WrappedProductSave)
+export default connect(mapStateToProps,mapDispatchToProps)(WrappedProductDetail)

@@ -3,197 +3,175 @@
 import React,{ Component } from 'react'
 import { connect } from 'react-redux'
 import {
-  Form, Input,Breadcrumb,InputNumber, Select,
-  Row, Col, Checkbox, Button, AutoComplete,
+  Breadcrumb,Popconfirm,Button
 } from 'antd';
 
-const { Option } = Select;
-
-import CategorySelector from './category-selector.js'
-import UploadImage from 'common/upload-image'
-import RichEditor from 'common/rich-editor'
-
-
 import { actionCreator } from './store'
-import { UPLOAD_PRODUCT_IMAGE,UPLOAD_PRODUCT_DETAIL_IMAGE } from 'api'
 
 import Layout from 'common/layout'
 
+import './detail.css'
 
-
-class ProductSave extends Component{
+class OrderDetail extends Component{
     constructor(props){
         super(props);
-        this.handleSubmit = this.handleSubmit.bind(this)
+        this.state = {
+          orderNo:this.props.match.params.orderNo
+        }
     }
-
-    handleSubmit(e){
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-          console.log('dd')
-          this.props.handleSave(err,values)
-        });
-    }        
-    render(){
-        const { getFieldDecorator } = this.props.form;
+    componentDidMount(){
+      if(this.state.orderNo){
+        this.props.handleOrderDetail(this.state.orderNo)
+      }
+    }      
+    render(){   
+      console.log('1',this.props) 
         const { 
-            handleCategoryId,
-            handleImages, 
-            handleDetail,
-            categoryIdValidateStatus,
-            categoryIdHelp,
-            imagesValidateStatus,
-            imagesHelp,
-            isSaveFetching
-          } = this.props;
-        const formItemLayout = {
-          labelCol: {
-            xs: { span: 24 },
-            sm: { span: 8 },
-          },
-          wrapperCol: {
-            xs: { span: 24 },
-            sm: { span: 16 },
-          },
-        };
-        const tailFormItemLayout = {
-          wrapperCol: {
-            xs: {
-              span: 24,
-              offset: 0,
-            },
-            sm: {
-              span: 16,
-              offset: 8,
-            },
-          },
-        };        
+            orderNo,
+            createdAt,
+            shipping,
+            statusDesc,
+            payment,
+            paymentTypeDesc,
+            productList,
+        } = this.props.order; 
+
+        console.log('orderNo:::')   
+
+        var createdTime = '';
+        if(createdAt){
+          createdTime = new Date(createdAt).toLocaleString()
+        }
+        
         return (
-        	<div className="ProductSave">
+        	<div className="OrderDetail">
         		<Layout>
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item>首页</Breadcrumb.Item>
-                        <Breadcrumb.Item>商品管理</Breadcrumb.Item>
-                        <Breadcrumb.Item>添加商品</Breadcrumb.Item>
+                        <Breadcrumb.Item>订单管理</Breadcrumb.Item>
+                        <Breadcrumb.Item>订单详情</Breadcrumb.Item>
                     </Breadcrumb>
-                    <Form {...formItemLayout}>
-                        <Form.Item label="商品名称">
-                          {getFieldDecorator('name', {
-                            rules: [{ required: true, message: '请输入商品名称!' }],
-                          })(
-                            <Input placeholder="商品名称" />
-                          )}
-                        </Form.Item>
+                     {
+                        orderNo 
+                        ?   <div className="order-detail">
+                                <div className="panel">
+                                    <h2 className="panel-header">订单信息</h2>
+                                    <div className="pandel-body">
+                                        <ul className="order-info">
+                                            <li className="order-no">
+                                                <span className="lable">订单号:</span>
+                                                <span className="text">{orderNo}</span>
+                                            </li>
+                                            <li className="order-create-time">
+                                                <span className="lable">创建时间:</span>
+                                                <span className="text">{createdTime}</span>
+                                            </li>
+                                            <li className="order-shipping-name">
+                                                <span className="lable">收件人:</span>
+                                                <span className="text">{shipping.name}({shipping.phone})</span>
+                                            </li>
+                                            <li className="order-shipping-address">
+                                                <span className="lable">收件地址:</span>
+                                                <span className="text">{shipping.province}{shipping.city}{shipping.address}(邮编:{shipping.zip})</span>
+                                            </li>   
+                                            <li className="order-status">
+                                                <span className="lable">订单状态:</span>
+                                                <span className="text">{statusDesc}</span>
+                                            </li>                   
+                                            <li className="order-payment">
+                                                <span className="lable">订单金额:</span>
+                                                <span className="text">￥{payment}</span>
+                                            </li>
+                                            <li className="order-payment-type">
+                                                <span className="lable">支付方式:</span>
+                                                <span className="text">{paymentTypeDesc}</span>
+                                            </li>
+                                            <li className="order-opreation">
+                                            {
+                                                status == '30'
+                                                ?   <Popconfirm 
+                                                        placement="top" 
+                                                        title={"确定已发货"} 
+                                                        onConfirm={()=>{
+                                                            this.props.handleOrderDeliver(orderNo)
+                                                        }} 
+                                                        okText="确定" 
+                                                        cancelText="取消">
+                                                        <Button type="primary">发货</Button>
+                                                    </Popconfirm>
+                                                : null
+                                            }
 
-                        <Form.Item label="商品描述">
-                          {getFieldDecorator('description', {
-                            rules: [{ required: true, message: '请输入商品描述!' }],
-                          })(
-                            <Input placeholder="商品描述" />
-                          )}
-                        </Form.Item>  
-
-                        <Form.Item 
-                          label="商品分类"
-                          required={true}
-                          validateStatus={categoryIdValidateStatus}
-                          help={categoryIdHelp}
-                        >
-                          <CategorySelector getCategoryId={(pid,id)=>{
-                            handleCategoryId(pid,id)
-                          }} />
-                        </Form.Item>
-
-                        <Form.Item label="商品价格">
-                          {getFieldDecorator('price', {
-                            rules: [{ required: true, message: '请输入商品价格!' }],
-                          })(
-                            <InputNumber 
-                               min={0}
-                            />
-                          )}
-                        </Form.Item>  
-
-                        <Form.Item label="商品库存">
-                          {getFieldDecorator('stock', {
-                            rules: [{ required: true, message: '请输入商品库存!' }],
-                          })(
-                            <InputNumber 
-                              min={0}
-                            />
-                          )}
-                        </Form.Item>
-
-                        <Form.Item 
-                          label="商品图片"
-                          required={true}
-                          validateStatus={imagesValidateStatus}
-                          help={imagesHelp}
-                        >
-                          <UploadImage
-                            action={UPLOAD_PRODUCT_IMAGE}
-                            max={3}
-                            getFileList={(fileList)=>{
-                              handleImages(fileList)
-                            }}
-                          />
-                        </Form.Item>
-
-                        <Form.Item label="商品描述">
-                          <RichEditor 
-                            url={UPLOAD_PRODUCT_DETAIL_IMAGE}
-                            getRichEditorValue={(value)=>{
-                              handleDetail(value)
-                            }}
-                          />
-                        </Form.Item>
-
-                        <Form.Item {...tailFormItemLayout}>
-                          <Button 
-                            type="primary"
-                            onClick={this.handleSubmit}
-                            loading={isSaveFetching}
-                          >
-                            提交
-                          </Button>
-                        </Form.Item>
-                    </Form>                  
+                                            </li>                                               
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className="panel">
+                                    <h2 className="panel-header">商品列表</h2>
+                                    <div className="pandel-body">
+                                        <ul className="product-title clearfix">
+                                            <li className="product-info">
+                                                商品
+                                            </li>
+                                            <li className="product-price">
+                                                单价
+                                            </li>
+                                            <li className="product-count">
+                                                数量
+                                            </li>
+                                            <li className="product-totalPrice">
+                                                小计
+                                            </li>
+                                        </ul>
+                                        {
+                                            productList.map((product,index)=>{
+                                                return   <ul className="product-item" key={index}>
+                                                            <li className="product-info text-ellipsis">
+                                                                <a href={"/product/detail/"+product.productId} className="link" target="_blank">
+                                                                    <img src={product.images.split(',')[0]} alt="" />
+                                                                    <span>{product.name}</span>
+                                                                </a>
+                                                            </li>
+                                                            <li className="product-price">
+                                                                ￥{product.price}
+                                                            </li>
+                                                            <li className="product-count">
+                                                                {product.count}
+                                                            </li>
+                                                            <li className="product-totalPrice">
+                                                                ￥{product.totalPrice}
+                                                            </li>   
+                                                        </ul>
+                                            })
+                                        }
+                                    </div>
+                                </div>                  
+                            </div>  
+                        : null
+                     }               
         		</Layout>
         	</div>
         )
     }
 }
-const WrappedProductSave = Form.create()(ProductSave);
 
 const mapStateToProps = (state)=>{
-    return {  
-      categoryIdValidateStatus:state.get('product').get('categoryIdValidateStatus'),
-      categoryIdHelp:state.get('product').get('categoryIdHelp'),
-      imagesValidateStatus:state.get('product').get('imagesValidateStatus'),
-      imagesHelp:state.get('product').get('imagesHelp'),
-      isSaveFetching:state.get('product').get('isSaveFetching'),
+    return {
+      order:state.get('order').get('order')
      }
-}
 
+}
 const mapDispatchToProps = (dispatch)=>{
     return {
-      handleCategoryId:(pid,id)=>{
-        const action = actionCreator.getSetCategoryAction(pid,id);
+      handleOrderDetail:(orderNo)=>{
+        const action = actionCreator.getOrderDetailAction(orderNo);
         dispatch(action)
       },
-      handleImages:(fileList)=>{
-        const action = actionCreator.getSetImagesAction(fileList);
-        dispatch(action)
-      },
-      handleDetail:(value)=>{
-        const action = actionCreator.getSetDetailAction(value);
-        dispatch(action)
-      },
-      handleSave:(err,values)=>{
-        const action = actionCreator.getSaveAction(err,values);
+      handleOrderDeliver:(orderNo)=>{
+        const action = actionCreator.getOrderDeliverAction(orderNo);
         dispatch(action)
       },
 
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(WrappedProductSave)
+export default connect(mapStateToProps,mapDispatchToProps)(OrderDetail)

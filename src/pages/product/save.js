@@ -25,7 +25,7 @@ class ProductSave extends Component{
     constructor(props){
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this)
-        console.log('aa',this.props.match.params.productId)
+        // console.log('aa-productId=',this.props.match.params.productId)
         this.state = {
           productId:this.props.match.params.productId
         }
@@ -38,7 +38,7 @@ class ProductSave extends Component{
     handleSubmit(e){
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
-          console.log('dd')
+          values.id = this.state.productId;
           this.props.handleSave(err,values)
         });
     }        
@@ -63,7 +63,16 @@ class ProductSave extends Component{
             price,
             stock,
           } = this.props;
-          console.log('1111',name)
+          let fileList = [];
+          if(images){
+            fileList = images.split(',').map((url,index)=>({
+              uid:index,
+              status:'done',
+              url:url,
+              response:url
+            }))
+
+          }
         const formItemLayout = {
           labelCol: {
             xs: { span: 24 },
@@ -107,6 +116,7 @@ class ProductSave extends Component{
                         <Form.Item label="商品描述">
                           {getFieldDecorator('description', {
                             rules: [{ required: true, message: '请输入商品描述!' }],
+                            initialValue:description
                           })(
                             <Input placeholder="商品描述" />
                           )}
@@ -118,14 +128,19 @@ class ProductSave extends Component{
                           validateStatus={categoryIdValidateStatus}
                           help={categoryIdHelp}
                         >
-                          <CategorySelector getCategoryId={(pid,id)=>{
-                            handleCategoryId(pid,id)
-                          }} />
+                          <CategorySelector 
+                            getCategoryId={(pid,id)=>{
+                              handleCategoryId(pid,id)
+                            }} 
+                            parentCategoryId={parentCategoryId}
+                            categoryId={categoryId}
+                          />
                         </Form.Item>
 
                         <Form.Item label="商品价格">
                           {getFieldDecorator('price', {
                             rules: [{ required: true, message: '请输入商品价格!' }],
+                            initialValue:price
                           })(
                             <InputNumber 
                                min={0}
@@ -136,6 +151,7 @@ class ProductSave extends Component{
                         <Form.Item label="商品库存">
                           {getFieldDecorator('stock', {
                             rules: [{ required: true, message: '请输入商品库存!' }],
+                            initialValue:stock
                           })(
                             <InputNumber 
                               min={0}
@@ -155,6 +171,7 @@ class ProductSave extends Component{
                             getFileList={(fileList)=>{
                               handleImages(fileList)
                             }}
+                            fileList={fileList}
                           />
                         </Form.Item>
 
@@ -164,6 +181,7 @@ class ProductSave extends Component{
                             getRichEditorValue={(value)=>{
                               handleDetail(value)
                             }}
+                            detail={detail}
                           />
                         </Form.Item>
 
@@ -210,6 +228,7 @@ const mapDispatchToProps = (dispatch)=>{
         dispatch(action)
       },
       handleImages:(fileList)=>{
+        console.log('ee',fileList)
         const action = actionCreator.getSetImagesAction(fileList);
         dispatch(action)
       },

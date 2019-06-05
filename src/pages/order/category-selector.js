@@ -16,7 +16,9 @@ class CategorySelector extends Component {
       levelOneCategories:[],
       leveOneId:'',
       levelTwoCategories:[],
-      leveTwoId:''
+      leveTwoId:'',
+      isChanged:false,
+      needLoadLvelTwo:false,
     }
     this.handleLevelOneChange = this.handleLevelOneChange.bind(this)
     this.handleLevelTwoChange = this.handleLevelTwoChange.bind(this)
@@ -24,6 +26,48 @@ class CategorySelector extends Component {
   }
   componentDidMount(){
     this.loadLevelOneCategories();
+  }
+  static getDerivedStateFromProps(props,state){
+    const { parentCategoryId,categoryId } = props;
+    const leveOneIdChanged = parentCategoryId != state.leveOneId;
+    const leveTwoIdChanged = categoryId != state.leveTwoId;
+
+    //新增商品时，不更新state
+    if(state.leveOneId && !parentCategoryId && !categoryId){
+      return null;
+    }
+
+    //分类Id没有改变，不更新state
+    if(!leveOneIdChanged && !leveTwoIdChanged){
+      return null;
+    }
+    if(state.isChanged){
+      return null;
+    }
+
+    //更新state
+    if(parentCategoryId == 0){
+      return{
+        leveOneId:categoryId,
+        leveTwoId:'',
+        isChanged:true,
+      }
+    }else{
+      return{
+        leveOneId:parentCategoryId,
+        leveTwoId:categoryId,
+        isChanged:true,
+        needLoadLvelTwo:true,
+      }
+    }
+
+    return null;
+  }
+  componentDidUpdate(){
+    if(this.state.needLoadLvelTwo){
+      this.loadLevelTowCategories();
+      this.setState(()=>({needLoadLvelTwo:false}))
+    }
   }
   loadLevelOneCategories(){
     request({
@@ -74,6 +118,7 @@ class CategorySelector extends Component {
   }
   render(){
     const { levelOneCategories,levelTwoCategories,leveOneId,leveTwoId } = this.state;
+    const { disabled } = this.props;
     const levelOneOptions = levelOneCategories.map(category=><Option key={category._id} value={category._id}>{category.name}</Option>)
     const levelTwoOptions = levelTwoCategories.map(category=><Option key={category._id} value={category._id}>{category.name}</Option>)
     return (
@@ -82,6 +127,7 @@ class CategorySelector extends Component {
           style={{width:200,marginRight:10}}
           onChange={this.handleLevelOneChange}
           value={leveOneId}
+          disabled={disabled}
         >
             {levelOneOptions}
          </Select>
@@ -91,6 +137,7 @@ class CategorySelector extends Component {
                 style={{width:200}}
                 onChange={this.handleLevelTwoChange}
                 value={leveTwoId}
+                disabled={disabled}
             >
                 {levelTwoOptions}
             </Select>

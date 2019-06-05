@@ -11,7 +11,7 @@ const defaultState = fromJS({
 	current:1,
 	pageSize:0,
 	total:0,
-	
+	updateNameModalVisible:false
 })
 //1. reducer是一个函数
 //2. reducer是一个纯函数(固定的输入就有固定的输出)
@@ -40,6 +40,12 @@ export default (state=defaultState,action)=>{
 	}
 	if(action.type == types.SET_LEAVE_ONE_CATEGORIES){
 		return state.set('leaveOneCategories',fromJS(action.payload))
+	}
+	if(action.type == types.SHOW_UPDATE_NAME_MODEL){
+		return state.set('updateNameModalVisible',true)
+	}
+	if(action.type == types.CLOSE_UPDATE_NAME_MODEL){
+		return state.set('updateNameModalVisible',false)
 	}
 	return state;
 }

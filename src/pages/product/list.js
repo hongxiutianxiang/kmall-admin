@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Breadcrumb, Button, Table, InputNumber, Divider,Modal,Input,Switch } from 'antd'
+const Search = Input.Search;
 import { Link } from "react-router-dom"
 import { actionCreator } from './store'
 import Layout from 'common/layout'
@@ -24,7 +25,8 @@ class ProductList extends Component {
             isPageFetching,
             handleUpdateOrder,
             handleUpdateStatus,
-     
+            handleSearch,
+            keyword
         } = this.props;
         const dataSource = list.map(product => {
             return {
@@ -43,6 +45,15 @@ class ProductList extends Component {
             title: '商品名称',
             dataIndex: 'name',
             key: 'name',
+            render:name=>{
+                if(keyword){
+                    const reg = new RegExp('('+keyword+')','ig');
+                    const html = name.replace(reg,"<b style='color:red'>$1</b>");
+                    return <span dangerouslySetInnerHTML={{__html:html}}></span>;
+                }else{
+                    return name;
+                }
+            }
         }, {
             title: '排序',
             dataIndex: 'order',
@@ -87,6 +98,14 @@ class ProductList extends Component {
                 <Breadcrumb.Item>商品列表</Breadcrumb.Item>
               </Breadcrumb>
               <div className="clearfix">
+                  <Search 
+                      placeholder="请输入商品名称关键字" 
+                      onSearch={value => {
+                        handleSearch(value)
+                      }} 
+                      enterButton 
+                      style={{ width: 300 }}
+                  />
                 <Link style={{float:'right'}} to="/product/save">
                     <Button  type="primary" >添加商品</Button>
                 </Link>
@@ -100,7 +119,11 @@ class ProductList extends Component {
                         total:total
                     }}
                     onChange={(page)=>{
-                        handlePage(page.current)
+                        if(keyword){
+                            handleSearch(keyword,page.current)
+                        }else{
+                            handlePage(page.current) 
+                        } 
                     }}
                     loading={{
                         spinning:isPageFetching,
@@ -119,6 +142,8 @@ const mapStateToProps = (state) => {
         pageSize: state.get('product').get('pageSize'),
         total: state.get('product').get('total'),
         isPageFetching: state.get('product').get('isPageFetching'),
+        keyword: state.get('product').get('keyword'),
+        
     }
 }
 
@@ -136,7 +161,10 @@ const mapDispatchToProps = (dispath) => {
             const action = actionCreator.getUpdateStatusAction(id,newStatus)
             dispath(action)            
         },
-       
+       handleSearch: (keyword,page) => {
+            const action = actionCreator.getSearchAction(keyword,page)
+            dispath(action)
+        },
     }
 }
 

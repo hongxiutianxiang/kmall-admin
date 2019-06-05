@@ -105,4 +105,15 @@ export const getLeaveOneCategoriesAction = ()=>{
 		})
 	}
 }
+export const getShowUpdateNameModel = ()=>{
+	return {
+		type:types.SHOW_UPDATE_NAME_MODEL
+	}
+}
+
+export const getCloseUpdateNameModel = ()=>{
+	return {
+		type:types.CLOSE_UPDATE_NAME_MODEL
+	}
+}
 
