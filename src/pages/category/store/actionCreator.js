@@ -2,7 +2,7 @@
 import * as types from './actionTypes.js'
 import { message } from 'antd'
 import { request } from 'util'
-import { GET_USERS,ADD_CATEGORY,GET_CATEGORIES } from 'api'
+import { GET_USERS,ADD_CATEGORY,GET_CATEGORIES,UPDATE_CATEGORY_NAME } from 'api'
 
 const getPageRequestAction = ()=>{
 	return {
@@ -105,15 +105,45 @@ export const getLeaveOneCategoriesAction = ()=>{
 		})
 	}
 }
-export const getShowUpdateNameModel = ()=>{
+export const getShowUpdateNameModel = (updateId,updateName)=>{
 	return {
-		type:types.SHOW_UPDATE_NAME_MODEL
+		type:types.SHOW_UPDATE_NAME_MODEL,
+		payload:{updateId,updateName}
 	}
 }
 
 export const getCloseUpdateNameModel = ()=>{
 	return {
 		type:types.CLOSE_UPDATE_NAME_MODEL
+	}
+}
+export const getUpdateNameChangeAction = (payload)=>{
+	return {
+		type:types.UPDATE_NAME_CHANGE,
+		payload
+	}
+}
+
+export const getUpdateNameAction = (pid)=>{
+	return (dispatch,getState)=>{
+		const state = getState().get('category');
+		request({
+			method:'put',
+			url:UPDATE_CATEGORY_NAME,
+			data:{
+				pid:pid,
+				id:state.get('updateId'),
+				name:state.get('updateName'),
+				page:state.get('current'),
+			}
+		})
+		.then(result=>{
+			if(result.code == 0){
+				message.success('更新名称成功')	
+				dispatch(getCloseUpdateNameModel())
+				dispatch(setPageAction(result.data))
+			}
+		})
 	}
 }
 

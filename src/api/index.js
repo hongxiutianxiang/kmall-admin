@@ -20,5 +20,6 @@ export const GET_ORDER_DETAIL = SERVER +'order/detail'
 export const SEARCH_ORDERS = SERVER +'order/search'
 export const UPDATE_ORDER_DELIVER = SERVER +'order/deliver'
 
+export const UPDATE_CATEGORY_NAME = SERVER +'category/updateName'
 
 

@@ -41,7 +41,10 @@ class CategoryList extends Component {
       isPageFetching,
       updateNameModalVisible,
       showUpdateNameModel,
-      closeUpdateNameModel
+      closeUpdateNameModel,
+      updateName,
+      handleUpdateNameChange,
+      handleUpdateName
     } = this.props;
     const { pid } = this.state
     const dataSource = list.map(category=>{
@@ -74,7 +77,7 @@ class CategoryList extends Component {
         <span>
           <a href="javascript:;"
              onClick={()=>{
-              showUpdateNameModel()
+              showUpdateNameModel(recode.id,recode.name)
              }}
           >
             修改名称
@@ -118,12 +121,17 @@ class CategoryList extends Component {
           <Modal
             title="修改分类名称"
             visible={updateNameModalVisible}
-            onOk={this.handleOk}
+            onOk={()=>handleUpdateName(pid)}
             onCancel={closeUpdateNameModel}
             cancelText="取消"
             okText="确认"
           >
-          <Input/>
+          <Input 
+            value={updateName} 
+            onChange={(ev)=>{
+              handleUpdateNameChange(ev.target.value)
+            }}
+          />
           </Modal>
         </Layout>	
     	</div>
@@ -140,7 +148,7 @@ const mapStateToProps = (state)=>{
     total:state.get('category').get('total'),
     isPageFetching:state.get('category').get('isPageFetching'),
     updateNameModalVisible:state.get('category').get('updateNameModalVisible'),
-
+    updateName:state.get('category').get('updateName'),
   }
 }
 
@@ -150,12 +158,20 @@ const mapDispatchToProps = (dispatch)=>{
       const action = actionCreator.getPageAction(pid,page);
       dispatch(action)
     },
-    showUpdateNameModel:()=>{
-      const action = actionCreator.getShowUpdateNameModel();
+    showUpdateNameModel:(updateId,updateName)=>{
+      const action = actionCreator.getShowUpdateNameModel(updateId,updateName);
       dispatch(action)
     },
     closeUpdateNameModel:()=>{
       const action = actionCreator.getCloseUpdateNameModel();
+      dispatch(action)
+    },
+    handleUpdateNameChange:(value)=>{
+      const action = actionCreator.getUpdateNameChangeAction(value);
+      dispatch(action)
+    },
+    handleUpdateName:(pid)=>{
+      const action = actionCreator.getUpdateNameAction(pid);
       dispatch(action)
     },
   }

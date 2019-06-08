@@ -12,3 +12,6 @@ export const ADD_DONE = 'category@add_done'
 export const SET_LEAVE_ONE_CATEGORIES = 'category@set_leave_one_categories'
 export const SHOW_UPDATE_NAME_MODEL = 'category@show_update_name_model'
 export const CLOSE_UPDATE_NAME_MODEL = 'category@close_update_name_model'
+export const UPDATE_NAME_CHANGE = 'category@update_name_change'
+
+
